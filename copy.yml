@@ -1,0 +1,78 @@
+---
+ 
+ - hosts: all
+   become: true
+   tasks:
+ 
+   - name: install updates (AlmaLinux)
+     tags: always
+     dnf:
+       update_only: yes
+       update_cache: yes
+     when: ansible_distribution == "AlmaLinux"
+ 
+   - name: install updates (Ubuntu)
+     tags: always
+     apt:
+       upgrade: dist
+       update_cache: yes
+     when: ansible_distribution == "Ubuntu"
+   
+   - name: install updates (Kali GNU/Linux)
+     tags: always
+     apt:
+       upgrade: dist
+       update_cache: yes
+     when: ansible_distribution == "Kali GNU/Linux"
+ 
+ - hosts: web_servers
+   become: true
+   pre_tasks:
+ 
+   - name: install apache and php for Kali GNU/Linux servers
+     tags: apache,apache2,ubuntu
+     apt:
+       name:
+         - apache2
+         - libapache2-mod-php
+       state: latest
+     when: ansible_distribution == "Kali GNU/Linux"
+ 
+   - name: install apache and php for AlmaLinux servers
+     tags: apache,almalinux,httpd
+     dnf:
+       name:
+         - httpd
+         - php
+       state: latest
+     when: ansible_distribution == "AlmaLinux"
+
+   - name: copy default html file for site
+     tags: apache,apache2,httpd
+     copy:
+       src: default_site.html
+       dest: /var/www/html/index.html
+       owner: root
+       group: root
+       mode: 0644
+
+ - hosts: db_servers
+   become: true
+   tasks:
+
+   - name: install mariadb package (Kali GNU/Linux)
+     tags: kalilinux,db,maridb
+     apt:
+       name: mariadb-server
+       state: latest
+     when: ansible_distribution == "Kali GNU/Linux"
+
+ - hosts: file_servers
+   become: true
+   tasks:
+     
+     - name: install samba package
+       tags: samba
+       package:
+         name: samba
+         state: latest
