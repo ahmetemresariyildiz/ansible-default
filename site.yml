@@ -2,49 +2,57 @@
  
  - hosts: all
    become: true
-   tasks:
-
-   - name: install updates (Ubuntu)
-     apt:
-       upgrade: dist
+   pre_tasks:
+ 
+   - name: update repository index (AlmaLinux)
+     tags: always
+     dnf:
        update_cache: yes
-     when: ansible_distribution == "Ubuntu"
-
-   - name: install updates (Kali GNU/Linux)
+     changed_when: false
+     when: ansible_distribution == "AlmaLinux"
+ 
+   - name: update repository index (Kali GNU/Linux)
+     tags: always
      apt:
-       upgrade: dist
        update_cache: yes
+     changed_when: false
      when: ansible_distribution == "Kali GNU/Linux"
 
-   - name: install updates (AlmaLinux)
-     dnf:
-       update_only: yes
+   - name: update repository index (CentOS)
+     tags: always
+     yum:
        update_cache: yes
-     when: ansible_distribution == "AlmaLinux"
-
+     changed_when: false
+     when: ansible_distribution == "CentOS"
+ 
+   - name: update repository index (Ubuntu)
+     tags: always
+     apt:
+       update_cache: yes
+     changed_when: false
+     when: ansible_distribution == "Ubuntu"
+ 
+ - hosts: all
+   become: true
+   roles:
+     - base
+    
+ - hosts: workstations
+   become: true
+   roles:
+     - workstations
+ 
  - hosts: web_servers
    become: true
-   
-    - name: install apache and php for Ubuntu servers
-      apt:
-        name:
-          - apache2
-          - libapache2-mod-php
-        state: latest
-      when: ansible_distribution == "Ubuntu"
-
-    - name: install apache and php for Kali GNU/Linux servers
-      apt:
-       name:
-        - apache2
-        - libapache2-mod-php
-       state: latest
-       when: ansible_distribution == "Kali GNU/Linux"
+   roles:
+     - web_servers
  
-    - name: install apache and php for CentOS servers
-      dnf:
-       name:
-        - httpd
-        - php
-       state: latest
-       when: ansible_distribution == "AlmaLinux"
+ - hosts: db_servers
+   become: true
+   roles:
+     - db_servers
+ 
+ - hosts: file_servers
+   become: true
+   roles:
+     - file_servers

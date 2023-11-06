@@ -1,0 +1,4 @@
+- name: add ssh key for oberyn
+  authorized_key:
+    user: oberyn
+    key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIM1ebZF8ZIqXasC9AR684zFOpZNFURelmGM/VnnUvDdA  ansible default

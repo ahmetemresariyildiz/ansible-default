@@ -1,0 +1,6 @@
+ - name: install mariadb server
+   tags: db,mariadb,kali
+   apt:
+     name: mariadb-server
+     state: latest
+   when: ansible_distribution == "Kali GNU/Linux"
